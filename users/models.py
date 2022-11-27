@@ -133,12 +133,12 @@ class Approved(UniversalIdModel, TimeStampedModel):
     """
 
     student = models.ForeignKey(RegisteredStudents, on_delete=models.CASCADE)
-    present = models.BooleanField(default=False)
+    present = models.BooleanField(default=True)
     unit = models.ForeignKey(Units, on_delete=models.CASCADE)
     total = models.PositiveIntegerField(blank=True, null=True)
 
     class Meta:
-        ordering = ["unit"]
+        ordering = ["unit", "student", "present", "total",]
 
 
 @receiver(pre_save, sender=Approved)

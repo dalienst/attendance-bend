@@ -38,14 +38,18 @@ class UserRegister(APIView):
 
 class UserView(generics.ListAPIView):
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [
+        IsAuthenticated,
+    ]
     queryset = User.objects.all()
 
 
 class LogoutView(GenericAPIView):
     serializer_class = LogoutSerializer
 
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [
+        IsAuthenticated,
+    ]
 
     def post(self, request):  # type:ignore[no-untyped-def]
 
@@ -69,56 +73,77 @@ class ProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
 class ProfileListView(generics.ListAPIView):
     serializer_class = ProfileSerializer
     queryset = Profile.objects.all()
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [
+        IsAuthenticated,
+    ]
 
 
 class UnitsListCreateView(generics.ListCreateAPIView):
     serializer_class = UnitsSerializer
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [
+        IsAuthenticated,
+    ]
     queryset = Units.objects.all()
 
 
 class UnitsDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UnitsSerializer
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [
+        IsAuthenticated,
+    ]
     queryset = Units.objects.all()
     lookup_field = "id"
 
 
 class RegisteredStudentsListCreateView(generics.ListCreateAPIView):
     serializer_class = RegisteredStudentsSerializer
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [
+        IsAuthenticated,
+    ]
     queryset = RegisteredStudents.objects.all()
+
 
 class RegisteredStudentList(generics.ListCreateAPIView):
     """
     View to only show the students registered to take the unit
     taught by the logged in lecturer
     """
+
     serializer_class = RegisteredStudentsSerializer
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [
+        IsAuthenticated,
+    ]
 
     def get_queryset(self):
         user = self.request.user
         return RegisteredStudents.objects.filter(unit__lecturer=user)
-    
+
 
 class RegisteredStudentsDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = RegisteredStudentsSerializer
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [
+        IsAuthenticated,
+    ]
     queryset = RegisteredStudents.objects.all()
     lookup_field = "id"
+
 
 class ApprovedListCreateView(generics.ListCreateAPIView):
     serializer_class = ApprovedSerializer
     queryset = Approved.objects.all()
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
 
 class ApprovedDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ApprovedSerializer
     queryset = Approved.objects.all()
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [
+        IsAuthenticated,
+    ]
     lookup_field = "id"
+
 
 class MyUnitsView(generics.ListAPIView):
     serializer_class = UnitsSerializer
@@ -129,7 +154,23 @@ class MyUnitsView(generics.ListAPIView):
         """
         user = self.request.user
         return Units.objects.filter(lecturer=user)
-    
+
+
+class MyUnitsStudentsApproveView(generics.ListAPIView):
+    """
+    View to only display the students marked for the unit that the lecturer
+    teaches
+    """
+    serializer_class = ApprovedSerializer
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Approved.objects.filter(unit__lecturer=user)
+
+
 # class UnitStudent(generics.ListAPIView):
 #     queryset = RegisteredStudents.objects.all()
 #     serializer_class = RegisteredStudentsSerializer

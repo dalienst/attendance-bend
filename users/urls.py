@@ -18,6 +18,7 @@ from users.views import (
     ApprovedListCreateView,
     MyUnitsView,
     RegisteredStudentList,
+    MyUnitsStudentsApproveView,
     # UnitStudent,
     # ApproveUnitStudentView,
     # UnitAndStudentView,
@@ -38,7 +39,8 @@ urlpatterns = [
     path("approve/", ApprovedListCreateView.as_view(), name="approve-list"),
     path("approved/<str:id>/", ApprovedDetailView.as_view(), name="approve-detail"),
     path("myunits/", MyUnitsView.as_view(), name="my-units"),
-    path("myunit/", RegisteredStudentList.as_view(), name="specified-unit"),
+    path("myunit/", RegisteredStudentList.as_view(), name="unit-student"),
+    path("myapprove/", MyUnitsStudentsApproveView.as_view(), name="student-approve"),
     # path("approves/<str:student>/", ApproveUnitStudentView.as_view(), name="approves"),
     # path("units", UnitAndStudentView.as_view(), name="units-students"),
 ]

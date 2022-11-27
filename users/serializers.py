@@ -168,7 +168,7 @@ class ApprovedSerializer(serializers.ModelSerializer):
     student = serializers.SlugRelatedField(
         queryset=RegisteredStudents.objects.all(), slug_field="regnumber"
     )
-    present = serializers.BooleanField(default=False)
+    present = serializers.BooleanField(default=True)
     unit = serializers.SlugRelatedField(
         queryset=Units.objects.all(), slug_field="code"
     )
