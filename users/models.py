@@ -138,7 +138,7 @@ class Approved(UniversalIdModel, TimeStampedModel):
     total = models.PositiveIntegerField(blank=True, null=True)
 
     class Meta:
-        ordering = ["unit", "created_at"]
+        ordering = ["-created_at", "unit"]
 
 
 @receiver(pre_save, sender=Approved)
