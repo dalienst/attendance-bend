@@ -40,6 +40,7 @@ class UserSerializer(serializers.ModelSerializer):
     name = serializers.CharField(
         max_length=50,
         min_length=4,
+        required=True,
     )
 
     password = serializers.CharField(
@@ -70,18 +71,23 @@ class ProfileSerializer(serializers.ModelSerializer):
     The profile serializer to enable retrieval and updating of profile of the user
     """
 
-    username = serializers.CharField(read_only=True, source="user.username")
+    name = serializers.CharField(read_only=True, source="user.name")
     bio = serializers.CharField(allow_blank=True, required=False)
     location = serializers.CharField(allow_blank=True, required=False)
+    contact = serializers.IntegerField(
+        required=False,
+        validators=[UniqueValidator(queryset=Profile.objects.all())],
+    )
 
     class Meta:
         model = Profile
-        fields = ("username", "bio", "location", "created_at", "updated_at")
+        fields = ("name", "bio", "location", "contact", "created_at", "updated_at")
         read_only_fields = ("id", "created_at", "updated-at")
 
     def update(self, instance, validated_data):
         instance.bio = validated_data.get("bio", instance.bio)
         instance.location = validated_data.get("location", instance.location)
+        instance.contact = validated_data("contact", instance.contact)
         instance.save()
         return instance
 
@@ -150,6 +156,7 @@ class RegisteredStudentsSerializer(serializers.ModelSerializer):
         max_length=200,
         min_length=2,
     )
+
     class Meta:
         model = RegisteredStudents
         fields = ("id", "unit", "regnumber", "sname", "created_at")
@@ -169,11 +176,16 @@ class ApprovedSerializer(serializers.ModelSerializer):
         queryset=RegisteredStudents.objects.all(), slug_field="regnumber"
     )
     present = serializers.BooleanField(default=True)
-    unit = serializers.SlugRelatedField(
-        queryset=Units.objects.all(), slug_field="code"
-    )
+    unit = serializers.SlugRelatedField(queryset=Units.objects.all(), slug_field="code")
 
     class Meta:
         model = Approved
-        fields = ("id", "student", "present", "unit", "total", "created_at",)
+        fields = (
+            "id",
+            "student",
+            "present",
+            "unit",
+            "total",
+            "created_at",
+        )
         read_only_fields = ("id", "total", "created_at")

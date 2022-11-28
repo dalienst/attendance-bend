@@ -85,7 +85,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel, UniversalIdMode
     USERNAME_FIELD = "email"
 
 
-class Profile(UniversalIdModel):
+class Profile(UniversalIdModel, TimeStampedModel):
     """
     User profile model
     """
@@ -94,6 +94,7 @@ class Profile(UniversalIdModel):
     # Add image
     bio = models.CharField(blank=True, max_length=500, null=True)
     location = models.CharField(blank=True, max_length=500, null=True)
+    contact = models.PositiveBigIntegerField(unique=True, null=True)
 
 
 class Units(UniversalIdModel, TimeStampedModel):
