@@ -78,10 +78,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     name = serializers.CharField(read_only=True, source="user.name")
     bio = serializers.CharField(allow_blank=True, required=False)
     location = serializers.CharField(allow_blank=True, required=False)
-    contact = serializers.IntegerField(
-        required=False,
-        validators=[UniqueValidator(queryset=Profile.objects.all())],
-    )
+    contact = serializers.IntegerField()
 
     class Meta:
         model = Profile
@@ -91,7 +88,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance.bio = validated_data.get("bio", instance.bio)
         instance.location = validated_data.get("location", instance.location)
-        instance.contact = validated_data("contact", instance.contact)
+        instance.contact = validated_data.get("contact", instance.contact)
         instance.save()
         return instance
 
@@ -199,6 +196,7 @@ class MarkStudentsSerializer(serializers.ModelSerializer):
         model = MarkStudents
         fields = ("id", "created_at", "student", "unit", "status", "marked_by")
         read_only_fields = ("id", "marked_by", "created_at")
+
     def create(self, validated_data):
         request = self.context["request"]
         validated_data["marked_by"] = request.user

@@ -94,7 +94,9 @@ class Profile(UniversalIdModel, TimeStampedModel):
     # Add image
     bio = models.CharField(blank=True, max_length=500, null=True)
     location = models.CharField(blank=True, max_length=500, null=True)
-    contact = models.PositiveBigIntegerField(unique=True, null=True)
+    contact = models.BigIntegerField(
+        _("phone number"), default=0, unique=True, blank=False
+    )
 
 
 class Units(UniversalIdModel, TimeStampedModel):

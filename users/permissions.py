@@ -7,4 +7,4 @@ class IsUser(permissions.BasePermission):
     def has_object_permission(
         self, request: Request, view: APIView, obj
     ) -> bool:
-        return bool(obj == request.user)
+        return bool(obj.user == request.user)
