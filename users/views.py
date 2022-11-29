@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, response, status
+from rest_framework import generics, status
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -14,10 +14,17 @@ from users.serializers import (
     LogoutSerializer,
     ProfileSerializer,
     UnitsSerializer,
-    ApprovedSerializer,
+    MarkStudentsSerializer,
     RegisteredStudentsSerializer,
+    StudentUnitsSerializer,
 )
-from users.models import Profile, Units, RegisteredStudents, Approved
+from users.models import (
+    Profile,
+    Units,
+    RegisteredStudents,
+    MarkStudents,
+    RegisterUnits,
+)
 from users.permissions import IsUser
 
 User = get_user_model()
@@ -34,6 +41,23 @@ class UserRegister(APIView):
         response["access"] = str(refresh.access_token)
 
         return Response(response, status=status.HTTP_201_CREATED)
+
+
+class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = UserSerializer
+    lookup_field = "id"
+    queryset = User.objects.all()
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    def delete(self, request, *args, **kwargs):
+        user = self.request.user
+        user.delete()
+        return Response(
+            {"message": "User deleted successfully"},
+            status=status.HTTP_204_NO_CONTENT,
+        )
 
 
 class UserView(generics.ListAPIView):
@@ -103,22 +127,6 @@ class RegisteredStudentsListCreateView(generics.ListCreateAPIView):
     queryset = RegisteredStudents.objects.all()
 
 
-class RegisteredStudentList(generics.ListCreateAPIView):
-    """
-    View to only show the students registered to take the unit
-    taught by the logged in lecturer
-    """
-
-    serializer_class = RegisteredStudentsSerializer
-    permission_classes = [
-        IsAuthenticated,
-    ]
-
-    def get_queryset(self):
-        user = self.request.user
-        return RegisteredStudents.objects.filter(unit__lecturer=user)
-
-
 class RegisteredStudentsDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = RegisteredStudentsSerializer
     permission_classes = [
@@ -128,21 +136,69 @@ class RegisteredStudentsDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "id"
 
 
-class ApprovedListCreateView(generics.ListCreateAPIView):
-    serializer_class = ApprovedSerializer
-    queryset = Approved.objects.all()
+class StudentUnitListCreateView(generics.ListCreateAPIView):
+    serializer_class = StudentUnitsSerializer
+    queryset = RegisterUnits.objects.all()
     permission_classes = [
         IsAuthenticated,
     ]
 
 
-class ApprovedDetailView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = ApprovedSerializer
-    queryset = Approved.objects.all()
+class StudentUnitDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = StudentUnitsSerializer
+    queryset = RegisterUnits.objects.all()
     permission_classes = [
         IsAuthenticated,
     ]
     lookup_field = "id"
+
+
+class LecturerStudentListView(generics.ListAPIView):
+    serializer_class = StudentUnitsSerializer
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    def get_queryset(self):
+        user = self.request.user
+        return RegisterUnits.objects.filter(unit__lecturer=user)
+
+
+class MarkStudentListCreateView(generics.ListCreateAPIView):
+    serializer_class = MarkStudentsSerializer
+    queryset = MarkStudents.objects.all()
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+
+class MarkStudentListView(generics.ListAPIView):
+    serializer_class = MarkStudentsSerializer
+    permission_classes = [
+        IsAuthenticated,
+    ]
+    queryset = MarkStudents.objects.all()
+
+    def get_queryset(self):
+        user = self.request.user
+        return super().get_queryset().filter(unit__lecturer=user)
+
+
+# class ApprovedListCreateView(generics.ListCreateAPIView):
+#     serializer_class = ApprovedSerializer
+#     queryset = Approved.objects.all()
+#     permission_classes = [
+#         IsAuthenticated,
+#     ]
+
+
+# class ApprovedDetailView(generics.RetrieveUpdateDestroyAPIView):
+#     serializer_class = ApprovedSerializer
+#     queryset = Approved.objects.all()
+#     permission_classes = [
+#         IsAuthenticated,
+#     ]
+#     lookup_field = "id"
 
 
 class MyUnitsView(generics.ListAPIView):
@@ -156,19 +212,41 @@ class MyUnitsView(generics.ListAPIView):
         return Units.objects.filter(lecturer=user)
 
 
-class MyUnitsStudentsApproveView(generics.ListAPIView):
-    """
-    View to only display the students marked for the unit that the lecturer
-    teaches
-    """
-    serializer_class = ApprovedSerializer
-    permission_classes = [
-        IsAuthenticated,
-    ]
+# class MyUnitsStudentsApproveView(generics.ListAPIView):
+#     """
+#     View to only display the students marked for the unit that the lecturer
+#     teaches
+#     """
 
-    def get_queryset(self):
-        user = self.request.user
-        return Approved.objects.filter(unit__lecturer=user)
+#     serializer_class = ApprovedSerializer
+#     permission_classes = [
+#         IsAuthenticated,
+#     ]
+
+#     def get_queryset(self):
+#         user = self.request.user
+#         return Approved.objects.filter(unit__lecturer=user)
+
+
+# class StatisticsView(generics.ListAPIView):
+#     serializer_class = StatisticsSerializer
+#     queryset = Approved.objects.all()
+
+
+# class RegisteredStudentList(generics.ListCreateAPIView):
+#     """
+#     View to only show the students registered to take the unit
+#     taught by the logged in lecturer
+#     """
+
+#     serializer_class = RegisteredStudentsSerializer
+#     permission_classes = [
+#         IsAuthenticated,
+#     ]
+
+#     def get_queryset(self):
+#         user = self.request.user
+#         return RegisteredStudents.objects.filter(unit__lecturer=user)
 
 
 # class UnitStudent(generics.ListAPIView):

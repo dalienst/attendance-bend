@@ -1,10 +1,14 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
-from users.models import Profile, Units, RegisteredStudents, Approved
+from rest_framework.validators import (
+    UniqueValidator,
+    UniqueTogetherValidator,
+    UniqueForDateValidator,
+)
+from users.models import Profile, Units, RegisteredStudents, RegisterUnits, MarkStudents
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
-
+from django.db.models import Count
 from users.validators import (
     validate_password_digit,
     validate_password_lowercase,
@@ -114,6 +118,7 @@ class LogoutSerializer(serializers.Serializer):
 class UnitsSerializer(serializers.ModelSerializer):
     """
     serializing the Units model
+    Creates a unit and allocates a lecturer
     """
 
     id = serializers.CharField(
@@ -140,14 +145,13 @@ class UnitsSerializer(serializers.ModelSerializer):
 
 class RegisteredStudentsSerializer(serializers.ModelSerializer):
     """
-    students registered for a specific unit
+    registers students
     """
 
     id = serializers.CharField(
         read_only=True,
     )
 
-    unit = serializers.SlugRelatedField(queryset=Units.objects.all(), slug_field="code")
     regnumber = serializers.CharField(
         max_length=30,
         min_length=2,
@@ -159,33 +163,78 @@ class RegisteredStudentsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RegisteredStudents
-        fields = ("id", "unit", "regnumber", "sname", "created_at")
+        fields = ("id", "regnumber", "sname", "created_at")
         read_only_fields = ("id", "created_at")
 
 
-class ApprovedSerializer(serializers.ModelSerializer):
+class StudentUnitsSerializer(serializers.ModelSerializer):
     """
-    Approval model serializer
+    Allocates units to students
     """
 
-    id = serializers.CharField(
-        read_only=True,
-    )
-
+    unit = serializers.SlugRelatedField(queryset=Units.objects.all(), slug_field="code")
     student = serializers.SlugRelatedField(
         queryset=RegisteredStudents.objects.all(), slug_field="regnumber"
     )
-    present = serializers.BooleanField(default=True)
-    unit = serializers.SlugRelatedField(queryset=Units.objects.all(), slug_field="code")
 
     class Meta:
-        model = Approved
-        fields = (
-            "id",
-            "student",
-            "present",
-            "unit",
-            "total",
-            "created_at",
-        )
-        read_only_fields = ("id", "total", "created_at")
+        model = RegisterUnits
+        fields = ("id", "unit", "student", "created_at")
+        read_only_fields = ("id", "created_at")
+
+    def create(self, validated_data):
+        instance, _ = RegisterUnits.objects.get_or_create(**validated_data)
+        return instance
+
+
+class MarkStudentsSerializer(serializers.ModelSerializer):
+    student = serializers.SlugRelatedField(
+        queryset=RegisteredStudents.objects.all(), slug_field="regnumber"
+    )
+    unit = serializers.SlugRelatedField(queryset=Units.objects.all(), slug_field="code")
+    marked_by = UserSerializer(read_only=True)
+    status = serializers.BooleanField(default=True)
+
+    class Meta:
+        model = MarkStudents
+        fields = ("id", "created_at", "student", "unit", "status", "marked_by")
+        read_only_fields = ("id", "marked_by", "created_at")
+    def create(self, validated_data):
+        request = self.context["request"]
+        validated_data["marked_by"] = request.user
+        instance = MarkStudents.objects.create(**validated_data)
+        return instance
+
+
+# class ApprovedSerializer(serializers.ModelSerializer):
+#     """
+#     Approval model serializer
+#     """
+
+#     id = serializers.CharField(
+#         read_only=True,
+#     )
+#     # attended_count = serializers.SerializerMethodField()
+
+#     student = serializers.SlugRelatedField(
+#         queryset=RegisteredStudents.objects.all(), slug_field="regnumber"
+#     )
+#     present = serializers.BooleanField(default=True)
+#     unit = serializers.SlugRelatedField(queryset=Units.objects.all(), slug_field="code")
+
+#     class Meta:
+#         model = Approved
+#         fields = (
+#             "id",
+#             "student",
+#             "present",
+#             "unit",
+#             "total",
+#             # "attended_count",
+#             "created_at",
+#         )
+#         read_only_fields = ("id", "total",  "created_at")
+
+#     # def get_attended_count(self,approved: Approved):
+#     #     # import pdb; pdb.set_trace()
+#     #     return Approved.objects.filter(present=True).values("present").annotate(approved=Count("unit"))

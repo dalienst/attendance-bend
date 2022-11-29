@@ -108,7 +108,10 @@ class Units(UniversalIdModel, TimeStampedModel):
     name = models.CharField(
         max_length=400,
     )
-    lecturer = models.ForeignKey(User, on_delete=models.CASCADE)
+    lecturer = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+
+    class Meta:
+        ordering = ["created_at", "code"]
 
 
 class RegisteredStudents(UniversalIdModel, TimeStampedModel):
@@ -116,7 +119,6 @@ class RegisteredStudents(UniversalIdModel, TimeStampedModel):
     model that will contain students
     """
 
-    unit = models.ForeignKey(Units, on_delete=models.CASCADE)
     regnumber = models.CharField(
         max_length=30,
     )
@@ -125,23 +127,44 @@ class RegisteredStudents(UniversalIdModel, TimeStampedModel):
     )
 
     class Meta:
-        ordering = ["unit"]
+        ordering = ["created_at"]
 
 
-class Approved(UniversalIdModel, TimeStampedModel):
+class RegisterUnits(UniversalIdModel, TimeStampedModel):
     """
-    used to mark the students
+    Table for students and the units
     """
-
-    student = models.ForeignKey(RegisteredStudents, on_delete=models.CASCADE)
-    present = models.BooleanField(default=True)
     unit = models.ForeignKey(Units, on_delete=models.CASCADE)
-    total = models.PositiveIntegerField(blank=True, null=True)
+    student = models.ForeignKey(RegisteredStudents, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ["-created_at", "unit"]
+        ordering = ["created_at", "unit"]
 
 
-@receiver(pre_save, sender=Approved)
-def total_pre_save(sender, instance, **kwargs):
-    instance.total = Approved.objects.filter(present=True).count()
+class MarkStudents(UniversalIdModel, TimeStampedModel):
+    student = models.ForeignKey(RegisteredStudents, on_delete=models.CASCADE)
+    unit = models.ForeignKey(Units, on_delete=models.CASCADE)
+    marked_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    status = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["created_at", "student", "status"]
+
+
+# class Approved(UniversalIdModel, TimeStampedModel):
+#     """
+#     used to mark the students
+#     """
+
+#     student = models.ForeignKey(RegisterUnits, on_delete=models.CASCADE)
+#     present = models.BooleanField(default=True)
+#     unit = models.ForeignKey(Units, on_delete=models.CASCADE)
+#     total = models.PositiveIntegerField(blank=True, null=True)
+
+#     class Meta:
+#         ordering = ["-created_at", "unit"]
+
+
+# @receiver(pre_save, sender=Approved)
+# def total_pre_save(sender, instance, **kwargs):
+#     instance.total = Approved.objects.filter(present=True).count()
