@@ -78,7 +78,7 @@ class RegisterUnitsAdmin(admin.ModelAdmin):
     ]
 
 
-admin.site.register(RegisterUnits, RegisteredStudentsAdmin)
+admin.site.register(RegisterUnits, RegisterUnitsAdmin)
 
 
 class MarkStudentsAdmin(admin.ModelAdmin):
