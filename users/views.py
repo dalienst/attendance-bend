@@ -25,7 +25,7 @@ from users.models import (
     MarkStudents,
     RegisterUnits,
 )
-from users.permissions import IsUser
+from users.permissions import IsUser, MeUser
 
 User = get_user_model()
 
@@ -87,7 +87,7 @@ class LogoutView(GenericAPIView):
 class ProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [
         IsAuthenticated,
-        IsUser,
+        MeUser,
     ]
     serializer_class = ProfileSerializer
     lookup_field = "user"
