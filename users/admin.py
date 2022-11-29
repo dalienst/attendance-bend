@@ -10,9 +10,88 @@ from users.models import (
 
 User = get_user_model()
 
-admin.site.register(User)
-admin.site.register(Profile)
-admin.site.register(Units)
-admin.site.register(RegisteredStudents)
-admin.site.register(MarkStudents)
-admin.site.register(RegisterUnits)
+
+class UserAdmin(admin.ModelAdmin):
+    list_display = [
+        "username",
+        "email",
+        "name",
+    ]
+    list_filter = [
+        "name",
+    ]
+
+
+admin.site.register(User, UserAdmin)
+
+
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = [
+        "user",
+        "bio",
+        "location",
+        "contact",
+    ]
+    list_filter = [
+        "user",
+    ]
+
+
+admin.site.register(Profile, ProfileAdmin)
+
+
+class UnitsAdmin(admin.ModelAdmin):
+    list_display = [
+        "code",
+        "name",
+        "lecturer",
+    ]
+    list_filter = [
+        "lecturer",
+        "code",
+    ]
+
+
+admin.site.register(Units, UnitsAdmin)
+
+
+class RegisteredStudentsAdmin(admin.ModelAdmin):
+    list_display = [
+        "regnumber",
+        "sname",
+    ]
+    list_filter = [
+        "sname",
+    ]
+
+
+admin.site.register(RegisteredStudents, RegisteredStudentsAdmin)
+
+
+class RegisterUnitsAdmin(admin.ModelAdmin):
+    list_display = [
+        "unit",
+        "student",
+    ]
+    list_filter = [
+        "unit",
+    ]
+
+
+admin.site.register(RegisterUnits, RegisteredStudentsAdmin)
+
+
+class MarkStudentsAdmin(admin.ModelAdmin):
+    list_display = [
+        "student",
+        "unit",
+        "marked_by",
+        "status",
+    ]
+    list_filter = [
+        "unit",
+        "student",
+    ]
+
+
+admin.site.register(MarkStudents, MarkStudentsAdmin)

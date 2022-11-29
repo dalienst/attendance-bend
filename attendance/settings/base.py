@@ -15,6 +15,7 @@ import dj_database_url
 from corsheaders.defaults import default_headers
 from decouple import config
 from datetime import timedelta
+import os
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -34,6 +35,7 @@ ALLOWED_HOSTS = [
     "http://localhost:3000",
     "localhost",
     "127.0.0.1",
+    "https://projectattend.netlify.app/",
 ]
 
 
@@ -150,6 +152,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "static"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
