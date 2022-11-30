@@ -13,6 +13,7 @@ User = get_user_model()
 
 class UserAdmin(admin.ModelAdmin):
     list_display = [
+        "id",
         "username",
         "email",
         "name",
@@ -42,6 +43,7 @@ admin.site.register(Profile, ProfileAdmin)
 
 class UnitsAdmin(admin.ModelAdmin):
     list_display = [
+        "id",
         "code",
         "name",
         "lecturer",
@@ -57,6 +59,7 @@ admin.site.register(Units, UnitsAdmin)
 
 class RegisteredStudentsAdmin(admin.ModelAdmin):
     list_display = [
+        "id",
         "regnumber",
         "sname",
     ]
@@ -86,6 +89,7 @@ class MarkStudentsAdmin(admin.ModelAdmin):
         "student",
         "unit",
         "status",
+        "total",
     ]
     list_filter = [
         "unit",

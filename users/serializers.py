@@ -125,6 +125,7 @@ class UnitsSerializer(serializers.ModelSerializer):
     code = serializers.CharField(
         max_length=20,
         min_length=2,
+        validators=[UniqueValidator(queryset=Units.objects.all())],
     )
     name = serializers.CharField(
         max_length=400,
@@ -152,6 +153,7 @@ class RegisteredStudentsSerializer(serializers.ModelSerializer):
     regnumber = serializers.CharField(
         max_length=30,
         min_length=2,
+        validators=[UniqueValidator(RegisteredStudents.objects.all())],
     )
     sname = serializers.CharField(
         max_length=200,
@@ -185,7 +187,7 @@ class RegisterUnitsSerializer(serializers.ModelSerializer):
         name = validated_data.get("unit")
         student = validated_data.get("student")
 
-        if RegisterUnits.objects.filter(student=student).count() >= 8:
+        if RegisterUnits.objects.filter(student=student).count() >= 5:
             raise serializers.ValidationError("student has reached maximum units")
         if RegisterUnits.objects.filter(unit=name).count() > 1:
             raise serializers.ValidationError("student can only register one unit once")
