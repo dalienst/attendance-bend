@@ -202,7 +202,6 @@ class MarkStudentsSerializer(serializers.ModelSerializer):
     unit = serializers.SlugRelatedField(queryset=Units.objects.all(), slug_field="code")
     status = serializers.BooleanField(default=True)
     created_at = serializers.DateTimeField(default=timezone.now, read_only=True)
-    total = serializers.IntegerField()
     # marked_at = serializers.DateTimeField(read_only=True, default=timezone.now())
 
     class Meta:
