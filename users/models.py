@@ -149,7 +149,7 @@ class MarkStudents(UniversalIdModel, TimeStampedModel):
     student = models.ForeignKey(RegisteredStudents, on_delete=models.CASCADE)
     unit = models.ForeignKey(Units, on_delete=models.CASCADE)
     status = models.BooleanField(default=True)
-    total = models.PositiveIntegerField(default=0, blank=True)
+    total = models.PositiveIntegerField(null=True, blank=True)
 
     class Meta:
         ordering = ["created_at", "student", "status"]
