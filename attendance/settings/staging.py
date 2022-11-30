@@ -4,8 +4,8 @@ ALLOWED_HOSTS = [
     "http://localhost:3000",
     "localhost",
     "127.0.0.1",
-    "https://projectattend.netlify.app",
-    "https://attendbend.up.railway.app",
+    "projectattend.netlify.app",
+    "attendbend.up.railway.app",
 ]
 
 DEBUG = True
