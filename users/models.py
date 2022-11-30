@@ -4,6 +4,7 @@ from django.contrib.auth.models import (
     BaseUserManager,
     PermissionsMixin,
 )
+import math
 from django.utils.translation import gettext_lazy as _
 from users.abstracts import TimeStampedModel, UniversalIdModel
 from django.db.models.signals import pre_save
@@ -136,6 +137,7 @@ class RegisterUnits(UniversalIdModel, TimeStampedModel):
     """
     Table for students and the units
     """
+
     unit = models.ForeignKey(Units, on_delete=models.CASCADE)
     student = models.ForeignKey(RegisteredStudents, on_delete=models.CASCADE)
 
@@ -146,11 +148,18 @@ class RegisterUnits(UniversalIdModel, TimeStampedModel):
 class MarkStudents(UniversalIdModel, TimeStampedModel):
     student = models.ForeignKey(RegisteredStudents, on_delete=models.CASCADE)
     unit = models.ForeignKey(Units, on_delete=models.CASCADE)
-    marked_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     status = models.BooleanField(default=True)
+    total = models.PositiveIntegerField(default=0, blank=True)
 
     class Meta:
         ordering = ["created_at", "student", "status"]
+
+
+@receiver(pre_save, sender=MarkStudents)
+def total_pre_save(sender, instance, **kwargs):
+    count_status = MarkStudents.objects.filter(status=True).count()
+    count_attended = (count_status)/15
+    instance.total = math.ceil(count_attended * 100)
 
 
 # class Approved(UniversalIdModel, TimeStampedModel):

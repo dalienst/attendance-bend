@@ -2,9 +2,9 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import (
     UniqueValidator,
-    UniqueTogetherValidator,
     UniqueForDateValidator,
 )
+from django.utils import timezone
 from users.models import Profile, Units, RegisteredStudents, RegisterUnits, MarkStudents
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
@@ -164,7 +164,7 @@ class RegisteredStudentsSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "created_at")
 
 
-class StudentUnitsSerializer(serializers.ModelSerializer):
+class RegisterUnitsSerializer(serializers.ModelSerializer):
     """
     Allocates units to students
     """
@@ -180,8 +180,17 @@ class StudentUnitsSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "created_at")
 
     def create(self, validated_data):
-        instance, _ = RegisterUnits.objects.get_or_create(**validated_data)
-        return instance
+        # instance, _ = RegisterUnits.objects.get_or_create(**validated_data)
+        # return instance
+        name = validated_data.get("unit")
+        student = validated_data.get("student")
+
+        if RegisterUnits.objects.filter(student=student).count() >= 8:
+            raise serializers.ValidationError("student has reached maximum units")
+        if RegisterUnits.objects.filter(unit=name).count() > 1:
+            raise serializers.ValidationError("student can only register one unit once")
+
+        return super().create(validated_data)
 
 
 class MarkStudentsSerializer(serializers.ModelSerializer):
@@ -189,19 +198,63 @@ class MarkStudentsSerializer(serializers.ModelSerializer):
         queryset=RegisteredStudents.objects.all(), slug_field="regnumber"
     )
     unit = serializers.SlugRelatedField(queryset=Units.objects.all(), slug_field="code")
-    marked_by = UserSerializer(read_only=True)
     status = serializers.BooleanField(default=True)
+    created_at = serializers.DateTimeField(default=timezone.now, read_only=True)
+    # marked_at = serializers.DateTimeField(read_only=True, default=timezone.now())
 
     class Meta:
         model = MarkStudents
-        fields = ("id", "created_at", "student", "unit", "status", "marked_by")
-        read_only_fields = ("id", "marked_by", "created_at")
+        fields = (
+            "id",
+            "created_at",
+            "student",
+            "unit",
+            "status",
+            "total",
+        )
+        read_only_fields = (
+            "id",
+            "created_at",
+            "total",
+        )
+        validators = [
+            UniqueForDateValidator(
+                queryset=MarkStudents.objects.all(),
+                field="unit",
+                date_field="created_at",
+                message="Unit can only be marked once",
+            )
+        ]
 
     def create(self, validated_data):
-        request = self.context["request"]
-        validated_data["marked_by"] = request.user
-        instance = MarkStudents.objects.create(**validated_data)
-        return instance
+        student = validated_data.get("student")
+        unit = validated_data.get("unit")
+        status = validated_data.get("status")
+
+        if (
+            MarkStudents.objects.filter(
+                student=student, unit=unit, status=status
+            ).count()
+            >= 14
+        ):
+            raise serializers.ValidationError("Semester is over")
+        return super().create(validated_data)
+
+
+class AttendanceSerializer(serializers.ModelSerializer):
+    unit_attendance = serializers.SerializerMethodField()
+    semester_attendance = serializers.SerializerMethodField()
+    # regnumber = serializers.CharField(read_only=True)
+
+    def get_unit_attendance(self, instance):
+        return MarkStudents.objects.filter(unit=instance).count()
+
+    def get_semester_attendance(self, instance):
+        return MarkStudents.objects.filter(student=instance).count()
+
+    class Meta:
+        model = RegisteredStudents
+        fields = ["unit_attendance", "semester_attendance"]
 
 
 # class ApprovedSerializer(serializers.ModelSerializer):

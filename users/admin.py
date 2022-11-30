@@ -85,7 +85,6 @@ class MarkStudentsAdmin(admin.ModelAdmin):
     list_display = [
         "student",
         "unit",
-        "marked_by",
         "status",
     ]
     list_filter = [

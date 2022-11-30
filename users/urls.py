@@ -17,6 +17,7 @@ from users.views import (
     RegisteredStudentsListCreateView,
     MarkStudentListCreateView,
     MarkStudentListView,
+    AttendanceStatisticsView,
     # ApprovedDetailView,
     # ApprovedListCreateView,
     # MyUnitsStudentsApproveView,
@@ -58,6 +59,7 @@ urlpatterns = [
 
     path("mystudents/", LecturerStudentListView.as_view(), name="unit-student"),
     path("marked/", MarkStudentListView.as_view(), name="marked-detail"),
+    path("attendance/", AttendanceStatisticsView.as_view(), name="attendance-list"),
 
     path("mark/", MarkStudentListCreateView.as_view(), name="mark-list"),
 

@@ -16,7 +16,8 @@ from users.serializers import (
     UnitsSerializer,
     MarkStudentsSerializer,
     RegisteredStudentsSerializer,
-    StudentUnitsSerializer,
+    RegisterUnitsSerializer,
+    AttendanceSerializer,
 )
 from users.models import (
     Profile,
@@ -137,7 +138,7 @@ class RegisteredStudentsDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class StudentUnitListCreateView(generics.ListCreateAPIView):
-    serializer_class = StudentUnitsSerializer
+    serializer_class = RegisterUnitsSerializer
     queryset = RegisterUnits.objects.all()
     permission_classes = [
         IsAuthenticated,
@@ -145,7 +146,7 @@ class StudentUnitListCreateView(generics.ListCreateAPIView):
 
 
 class StudentUnitDetailView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = StudentUnitsSerializer
+    serializer_class = RegisterUnitsSerializer
     queryset = RegisterUnits.objects.all()
     permission_classes = [
         IsAuthenticated,
@@ -154,7 +155,7 @@ class StudentUnitDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class LecturerStudentListView(generics.ListAPIView):
-    serializer_class = StudentUnitsSerializer
+    serializer_class = RegisterUnitsSerializer
     permission_classes = [
         IsAuthenticated,
     ]
@@ -183,6 +184,10 @@ class MarkStudentListView(generics.ListAPIView):
         user = self.request.user
         return super().get_queryset().filter(unit__lecturer=user)
 
+class AttendanceStatisticsView(generics.ListAPIView):
+    serializer_class = AttendanceSerializer
+    queryset = MarkStudents.objects.all()
+    # permission_classes = [IsAuthenticated,]
 
 # class ApprovedListCreateView(generics.ListCreateAPIView):
 #     serializer_class = ApprovedSerializer
