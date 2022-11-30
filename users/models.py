@@ -157,9 +157,10 @@ class MarkStudents(UniversalIdModel, TimeStampedModel):
 
 @receiver(pre_save, sender=MarkStudents)
 def total_pre_save(sender, instance, **kwargs):
-    count_status = MarkStudents.objects.filter(status=True).count()
-    count_attended = (count_status)/15
-    instance.total = math.ceil(count_attended * 100)
+    instance.total = MarkStudents.objects.filter(status=True).count()
+    # count_status = MarkStudents.objects.filter(status=True).count()
+    # count_attended = (count_status)/15
+    # instance.total = math.ceil(count_attended * 100)
 
 
 # class Approved(UniversalIdModel, TimeStampedModel):
