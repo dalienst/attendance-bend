@@ -96,7 +96,7 @@ class Profile(UniversalIdModel, TimeStampedModel):
     bio = models.CharField(blank=True, max_length=500, null=True)
     location = models.CharField(blank=True, max_length=500, null=True)
     contact = models.BigIntegerField(
-        _("phone number"), default=0, unique=True, blank=False
+        _("phone number"), default=0, blank=False
     )
 
 
