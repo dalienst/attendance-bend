@@ -92,6 +92,10 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOW_HEADERS = default_headers + ("Access-Control-Allow-Origin",)
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://attendbend.up.railway",
+]
+
 AUTH_USER_MODEL = "users.User"
 
 ROOT_URLCONF = "attendance.urls"
