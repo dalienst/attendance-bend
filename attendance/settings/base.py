@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "django_filters",
     # App imports
     "users",
+    "flights",
 ]
 
 MIDDLEWARE = [
