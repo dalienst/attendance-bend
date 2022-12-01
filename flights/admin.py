@@ -1,5 +1,5 @@
 from django.contrib import admin
-from flights.models import Route, Flight
+from flights.models import Route, Flight, Book
 
 
 class RouteAdmin(admin.ModelAdmin):
@@ -37,3 +37,18 @@ class FlightAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Flight, FlightAdmin)
+
+
+class BookAdmin(admin.ModelAdmin):
+    list_display = [
+        "name",
+        "contact",
+        "flight",
+        "date",
+    ]
+    list_filter = [
+        "date",
+        "flight",
+    ]
+
+admin.site.register(Book, BookAdmin)

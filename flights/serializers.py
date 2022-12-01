@@ -1,4 +1,4 @@
-from flights.models import Route, Flight
+from flights.models import Route, Flight, Book
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -84,3 +84,22 @@ class FlightSerializer(serializers.ModelSerializer):
 
 
 # validate
+
+class BookSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(
+        read_only=True,
+    )
+    name = serializers.CharField(
+        max_length=200,
+        min_length=2,
+    )
+    contact = serializers.IntegerField(required=True)
+    flight = serializers.SlugRelatedField(
+        queryset=Flight.objects.all(), slug_field="name"
+    )
+    date = serializers.DateField()
+
+    class Meta:
+        model = Book
+        fields = ("id", "name", "contact", "flight", "date", "created_at")
+        read_only_fields = ("id", "created_at")

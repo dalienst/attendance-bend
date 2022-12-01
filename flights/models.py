@@ -40,3 +40,19 @@ class Flight(TimeStampedModel, UniversalIdModel):
             "arrival",
             "price",
         ]
+
+
+class Book(TimeStampedModel, UniversalIdModel):
+    name = models.CharField(max_length=400)
+    contact = models.PositiveIntegerField()
+    flight = models.ForeignKey(Flight, on_delete=models.CASCADE)
+    date = models.DateField(auto_now=False, auto_now_add=False)
+
+    class Meta:
+        ordering = [
+            "name",
+            "contact",
+            "flight",
+            "date",
+            "created_at",
+        ]
