@@ -45,6 +45,7 @@ class Flight(TimeStampedModel, UniversalIdModel):
 class Book(TimeStampedModel, UniversalIdModel):
     name = models.CharField(max_length=400)
     contact = models.PositiveIntegerField()
+    email = models.EmailField()
     flight = models.ForeignKey(Flight, on_delete=models.CASCADE)
     date = models.DateField(auto_now=False, auto_now_add=False)
 
@@ -52,6 +53,7 @@ class Book(TimeStampedModel, UniversalIdModel):
         ordering = [
             "name",
             "contact",
+            "email",
             "flight",
             "date",
             "created_at",

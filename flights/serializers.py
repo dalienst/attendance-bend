@@ -93,6 +93,9 @@ class BookSerializer(serializers.ModelSerializer):
         max_length=200,
         min_length=2,
     )
+    email = serializers.EmailField(
+        required=True,
+    )
     contact = serializers.IntegerField(required=True)
     flight = serializers.SlugRelatedField(
         queryset=Flight.objects.all(), slug_field="name"
@@ -101,5 +104,5 @@ class BookSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Book
-        fields = ("id", "name", "contact", "flight", "date", "created_at")
+        fields = ("id", "name", "contact", "email", "flight", "date", "created_at")
         read_only_fields = ("id", "created_at")

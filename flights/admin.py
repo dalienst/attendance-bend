@@ -43,6 +43,7 @@ class BookAdmin(admin.ModelAdmin):
     list_display = [
         "name",
         "contact",
+        "email",
         "flight",
         "date",
     ]
